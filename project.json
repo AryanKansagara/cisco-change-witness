@@ -1,0 +1,9 @@
+{
+  "company": "Cisco",
+  "title": "Change Witness",
+  "test_command": "make test",
+  "demo_command": "make demo",
+  "scope": "Native bounded allow-edge rollout search; no full routing or physical network integration",
+  "implemented": true,
+  "integration_status": "unverified"
+}

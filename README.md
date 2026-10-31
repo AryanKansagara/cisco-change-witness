@@ -1,0 +1,12 @@
+# Change Witness
+Cisco builds networking hardware and automation software. This independent C++17 lab finds unsafe intermediate ACL-edge states and a safe rollout order in a deliberately restricted directed graph.
+
+Requires g++, Make and Python 3.11+: `make test`; `make demo`. `./build/witness --demo` emits actual JSON for a four-node migration where deleting the old path first disconnects the target, but adding the new path first preserves reachability. `measured-demo.json` records this run. No device, API, Batfish or full router integration exists.
+
+Input on stdin: `N M K source target`, followed by M `from to enabled` lines, then K `edge_index enabled` lines. All indices are zero-based; enabled is 0/1. N is2..8, M0..32, K0..12; each edge can be changed at most once. The invariant is directed source-to-target reachability in every snapshot, including baseline and final. There is no deny precedence, packet header matching, routing, protocol convergence, timing or vendor syntax. Edges model allow connectivity only.
+
+The solver exhausts all2^K states, reports unsafe masks, computes a globally minimum-cardinality unsafe change subset (ties smallest numeric mask), gives the reachable-side cut, and searches for an order with every prefix safe. An unsafe baseline means no safe order, even if the final state recovers. The minimized subset is a snapshot counterexample, not a physical packet trace. Search uses native C++ for bounded combinatorial enumeration; no performance claim follows from that choice.
+
+Tests independently compute transitive closure and enumerate permutations on200 seeded generated graphs, compare all unsafe masks, order feasibility and minimal cardinality. Negative controls cover no-op/unrelated changes, empty changes, impossible plans, initially unsafe graphs and rejected grammar. Next: richer flow ACL semantics and optional snapshot cross-checks before any lab integration.
+
+Existing overlap and primary sources (research2026-10-31): Cisco already manages drift https://netascode.cisco.com/docs/guides/concepts/managing_drift/ and https://blogs.cisco.com/networking/cisco-dna-center-and-device-configuration-management?oid=pstswt029934 ; Batfish already checks differential reachability https://github.com/batfish/batfish/blob/master/docs/symbolic_engine/README.md . This is a bounded rollout-order experiment, not an affiliation, novelty claim, production safety certificate or full Cisco routing validation.
